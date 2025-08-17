@@ -57,3 +57,21 @@ id = "async-sim"
 name = "Async Simulation"
 script = "examples/async_sim.rhai"
 doc = "examples/async_sim.md"
+
+[[examples]]
+id = "collections"
+name = "Collections & Iteration"
+script = "examples/collections.rhai"
+doc = "examples/collections.md"
+
+[[examples]]
+id = "error-handling"
+name = "Error Handling"
+script = "examples/error_handling.rhai"
+doc = "examples/error_handling.md"
+
+[[examples]]
+id = "random"
+name = "Random Number"
+script = "examples/random.rhai"
+doc = "examples/random.md"

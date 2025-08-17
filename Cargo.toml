@@ -12,6 +12,7 @@ serde_json = "1.0.142"
 toml = "0.8.19"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
 notify = "6"
+rand = "0.8"
 
 [dev-dependencies]
 criterion = "0.7.0"

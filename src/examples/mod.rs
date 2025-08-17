@@ -1,6 +1,7 @@
 //! Utilities for loading, running, and documenting Rhai example scripts.
 
 use rhai::{Dynamic, Engine, module_resolvers::FileModuleResolver};
+use rand::Rng;
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -51,6 +52,10 @@ fn read_file(path: &str) -> String {
 
 fn sleep_ms(ms: i64) {
     std::thread::sleep(std::time::Duration::from_millis(ms as u64));
+}
+
+fn rand_int(min: i64, max: i64) -> i64 {
+    rand::thread_rng().gen_range(min..=max)
 }
 
 /// Metadata and execution support for a single Rhai example.
@@ -117,6 +122,7 @@ impl Example {
         engine.register_fn("assert", assert_fn);
         engine.register_fn("read_file", read_file);
         engine.register_fn("sleep_ms", sleep_ms);
+        engine.register_fn("rand_int", rand_int);
 
         // Evaluate the script file so relative imports work.
         let value = engine
