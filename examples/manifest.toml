@@ -2,76 +2,76 @@
 id = "hello"
 name = "Hello World"
 script = "examples/hello.rhai"
-doc = "examples/hello.md"
+doc = "examples/hello.html"
 
 [[examples]]
 id = "basic-arith"
 name = "Basic Arithmetic"
 script = "examples/basic_arith.rhai"
-doc = "examples/basic_arith.md"
+doc = "examples/basic_arith.html"
 
 [[examples]]
 id = "use-struct"
 name = "Using a Rust Struct"
 script = "examples/use_struct.rhai"
-doc = "examples/use_struct.md"
+doc = "examples/use_struct.html"
 
 [[examples]]
 id = "http-request"
 name = "HTTP Request"
 script = "examples/http_request.rhai"
-doc = "examples/http_request.md"
+doc = "examples/http_request.html"
 
 [[examples]]
 id = "serde-demo"
 name = "Serde Demo"
 script = "examples/serde_demo.rhai"
-doc = "examples/serde_demo.md"
+doc = "examples/serde_demo.html"
 
 [[examples]]
 id = "perf-loop"
 name = "Performance Loop"
 script = "examples/perf_loop.rhai"
-doc = "examples/perf_loop.md"
+doc = "examples/perf_loop.html"
 
 [[examples]]
 id = "unit-tests"
 name = "Unit Test Style"
 script = "examples/unit_tests.rhai"
-doc = "examples/unit_tests.md"
+doc = "examples/unit_tests.html"
 
 [[examples]]
 id = "hot-swap"
 name = "Hot Swap"
 script = "examples/hot_swap.rhai"
-doc = "examples/hot_swap.md"
+doc = "examples/hot_swap.html"
 
 [[examples]]
 id = "custom-module"
 name = "Custom Module"
 script = "examples/custom_module.rhai"
-doc = "examples/custom_module.md"
+doc = "examples/custom_module.html"
 
 [[examples]]
 id = "async-sim"
 name = "Async Simulation"
 script = "examples/async_sim.rhai"
-doc = "examples/async_sim.md"
+doc = "examples/async_sim.html"
 
 [[examples]]
 id = "collections"
 name = "Collections & Iteration"
 script = "examples/collections.rhai"
-doc = "examples/collections.md"
+doc = "examples/collections.html"
 
 [[examples]]
 id = "error-handling"
 name = "Error Handling"
 script = "examples/error_handling.rhai"
-doc = "examples/error_handling.md"
+doc = "examples/error_handling.html"
 
 [[examples]]
 id = "random"
 name = "Random Number"
 script = "examples/random.rhai"
-doc = "examples/random.md"
+doc = "examples/random.html"
