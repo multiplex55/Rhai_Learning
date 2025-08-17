@@ -1,7 +1,7 @@
 //! Utilities for loading, running, and documenting Rhai example scripts.
 
-use rhai::{Dynamic, Engine, module_resolvers::FileModuleResolver};
 use rand::Rng;
+use rhai::{Dynamic, Engine, module_resolvers::FileModuleResolver};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -130,6 +130,65 @@ impl Example {
         // Evaluate the script file so relative imports work.
         let value = engine
             .eval_file::<Dynamic>(self.script_path.clone())
+            .unwrap_or_else(|e| format!("Error: {e}").into());
+
+        let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
+
+        if !stdout.is_empty() {
+            let log_dir = std::path::Path::new("logs");
+            let _ = std::fs::create_dir_all(log_dir);
+            let log_path = log_dir.join(format!("{}.log", self.id));
+            let _ = std::fs::write(log_path, &stdout);
+        }
+
+        RunResult { stdout, value }
+    }
+
+    /// Run a provided script text for this example instead of reading from file.
+    ///
+    /// The script is executed with the same engine configuration as [`run`].
+    pub fn run_script(&self, script: &str) -> RunResult {
+        let stdout = Arc::new(Mutex::new(String::new()));
+        let mut engine = Engine::new();
+        let mut resolver = FileModuleResolver::new();
+        if let Some(parent) = self.script_path.parent() {
+            resolver.set_base_path(parent);
+        }
+        engine.set_module_resolver(resolver);
+        // Capture calls to `print` into our stdout buffer.
+        let out = stdout.clone();
+        engine.on_print(move |s| {
+            if let Ok(mut buf) = out.lock() {
+                buf.push_str(s);
+                buf.push('\n');
+            }
+        });
+
+        // Capture debug output as well.
+        let out_dbg = stdout.clone();
+        engine.on_debug(move |s, _, _| {
+            if let Ok(mut buf) = out_dbg.lock() {
+                buf.push_str("DEBUG: ");
+                buf.push_str(s);
+                buf.push('\n');
+            }
+        });
+
+        // Register custom Rust types and helper functions.
+        engine.register_type::<Point>();
+        engine.register_fn("Point", Point::new);
+        engine.register_fn("length", Point::length);
+        engine.register_fn("http_get", http_get);
+        engine.register_fn("to_json", to_json);
+        engine.register_fn("from_json", from_json);
+        engine.register_fn("assert", assert_fn);
+        engine.register_fn("read_file", read_file);
+        engine.register_fn("sleep_ms", sleep_ms);
+        engine.register_fn("rand_int", rand_int);
+
+        // Evaluate the provided script text.
+        let value = engine
+            .eval::<Dynamic>(script)
             .unwrap_or_else(|e| format!("Error: {e}").into());
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
