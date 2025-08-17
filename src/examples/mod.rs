@@ -49,6 +49,10 @@ fn read_file(path: &str) -> String {
     std::fs::read_to_string(path).unwrap_or_else(|e| format!("Error reading file: {e}"))
 }
 
+fn sleep_ms(ms: i64) {
+    std::thread::sleep(std::time::Duration::from_millis(ms as u64));
+}
+
 /// Metadata and execution support for a single Rhai example.
 #[derive(Clone, Debug)]
 pub struct Example {
@@ -112,6 +116,7 @@ impl Example {
         engine.register_fn("from_json", from_json);
         engine.register_fn("assert", assert_fn);
         engine.register_fn("read_file", read_file);
+        engine.register_fn("sleep_ms", sleep_ms);
 
         // Evaluate the script file so relative imports work.
         let value = engine
@@ -224,6 +229,8 @@ mod tests {
             "perf-loop",
             "unit-tests",
             "hot-swap",
+            "custom-module",
+            "async-sim",
         ];
 
         let registry = ExampleRegistry::all();

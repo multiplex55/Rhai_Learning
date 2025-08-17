@@ -27,6 +27,21 @@ The application window lists all available example scripts located under
 result in the console panel. Each example links to its documentation and
 source so you can explore and modify the code.
 
+## Examples
+
+The project includes the following scripts:
+
+- Hello World
+- Basic Arithmetic
+- Using a Rust Struct
+- HTTP Request
+- Serde Demo
+- Performance Loop
+- Unit Test Style
+- Hot Swap
+- Custom Module – load functions from a user-defined module.
+- Async Simulation – mimic asynchronous tasks with a `sleep_ms` helper.
+
 ## UI Usage
 
 * **Example List** – displayed on the left. Select an entry to view details.
