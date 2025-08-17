@@ -119,6 +119,14 @@ impl Example {
             .unwrap_or_else(|e| format!("Error: {e}").into());
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
+
+        if !stdout.is_empty() {
+            let log_dir = std::path::Path::new("logs");
+            let _ = std::fs::create_dir_all(log_dir);
+            let log_path = log_dir.join(format!("{}.log", self.id));
+            let _ = std::fs::write(log_path, &stdout);
+        }
+
         RunResult { stdout, value }
     }
 }
