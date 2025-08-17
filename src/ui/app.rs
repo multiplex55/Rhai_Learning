@@ -17,6 +17,10 @@ pub struct App {
     reload_notice: Option<String>,
     /// Current filter for example names.
     filter: String,
+    /// Editable script text of the currently selected example.
+    script: String,
+    /// ID of the example whose script is loaded in `script`.
+    loaded_script: Option<String>,
 }
 
 impl Default for App {
@@ -41,15 +45,26 @@ impl Default for App {
             watch_rx: rx,
             reload_notice: None,
             filter: String::new(),
+            script: String::new(),
+            loaded_script: None,
         }
     }
 }
 
 impl App {
+    fn load_selected_script(&mut self) {
+        if let Some(idx) = self.selected {
+            if let Some(example) = self.examples.get(idx) {
+                self.script = std::fs::read_to_string(&example.script_path).unwrap_or_default();
+                self.loaded_script = Some(example.id.clone());
+            }
+        }
+    }
+
     fn run_selected(&mut self) {
         if let Some(idx) = self.selected {
             if let Some(example) = self.examples.get(idx) {
-                let result = example.run();
+                let result = example.run_script(&self.script);
                 self.console.clear();
                 if !result.stdout.is_empty() {
                     self.console.push_str(&result.stdout);
@@ -78,6 +93,7 @@ impl eframe::App for App {
                 self.selected =
                     selected_id.and_then(|id| self.examples.iter().position(|e| e.id == id));
                 if self.selected.is_some() {
+                    self.load_selected_script();
                     self.run_selected();
                 }
                 self.reload_notice = Some("Scripts recompiled".to_string());
@@ -96,6 +112,7 @@ impl eframe::App for App {
                 self.selected =
                     selected_id.and_then(|id| self.examples.iter().position(|e| e.id == id));
                 if self.selected.is_some() {
+                    self.load_selected_script();
                     self.run_selected();
                 }
             }
@@ -115,6 +132,7 @@ impl eframe::App for App {
                             .clicked()
                         {
                             self.selected = Some(i);
+                            self.loaded_script = None;
                         }
                     } else if let Some(pos) = name.find(&filter) {
                         let len = self.filter.len();
@@ -138,6 +156,7 @@ impl eframe::App for App {
                         );
                         if ui.selectable_label(self.selected == Some(i), job).clicked() {
                             self.selected = Some(i);
+                            self.loaded_script = None;
                         }
                     }
                 }
@@ -165,6 +184,13 @@ impl eframe::App for App {
         // Main central panel with example details.
         egui::CentralPanel::default().show(ctx, |ui| {
             if let Some(idx) = self.selected {
+                let need_load = {
+                    let id = &self.examples[idx].id;
+                    self.loaded_script.as_deref() != Some(id)
+                };
+                if need_load {
+                    self.load_selected_script();
+                }
                 let ex = &self.examples[idx];
                 ui.heading(&ex.name);
                 ui.label(&ex.description);
@@ -173,9 +199,24 @@ impl eframe::App for App {
                 }
                 // Link to rendered HTML documentation instead of raw Markdown
                 ui.hyperlink_to("Documentation", ex.doc_html_path.to_string_lossy());
-                if ui.button("Run").clicked() {
-                    self.run_selected();
-                }
+
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.add(
+                        egui::TextEdit::multiline(&mut self.script)
+                            .code_editor()
+                            .desired_rows(20),
+                    );
+                });
+
+                let script_path = ex.script_path.clone();
+                ui.horizontal(|ui| {
+                    if ui.button("Run").clicked() {
+                        self.run_selected();
+                    }
+                    if ui.button("Save").clicked() {
+                        let _ = std::fs::write(&script_path, &self.script);
+                    }
+                });
             } else {
                 ui.label("Select an example from the left");
             }
