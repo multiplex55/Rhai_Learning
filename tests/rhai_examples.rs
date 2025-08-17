@@ -1,6 +1,14 @@
 use Rhai_Learning::examples::ExampleRegistry;
 
 #[test]
+fn example_docs_exist() {
+    let registry = ExampleRegistry::all();
+    for ex in &registry {
+        assert!(ex.doc_html_path.exists(), "missing doc for {}", ex.id);
+    }
+}
+
+#[test]
 fn hello_example_runs() {
     let registry = ExampleRegistry::all();
     let ex = registry
