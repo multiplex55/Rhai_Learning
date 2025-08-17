@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Performance Loop</h1>
+<p>Benchmarks a simple summation loop.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let total = 0;
+</span><span style="color:#c0c5ce;">for n in 0..100000 {
+</span><span style="color:#c0c5ce;">    total += n;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">print(total);
+</span><span style="color:#c0c5ce;">total
+</span></code></pre>
+<h2>How It Works</h2>
+<p>The loop adds integers from 0 to 99,999, prints the sum, and returns it. This
+shows the cost of a tight loop in Rhai.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">4999950000
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Highlights looping performance.</li>
+<li>No Rust helpers are used; everything runs in Rhai.</li>
+</ul>
+<p>Note: Use release builds for accurate benchmarks; see <a href="https://rhai.rs/book/performance/benchmarking.html">https://rhai.rs/book/performance/benchmarking.html</a>.</p>
+</body></html>

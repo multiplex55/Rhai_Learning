@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>HTTP Request</h1>
+<p>Fetches JSON from a remote API.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let data = http_get(&quot;https://httpbin.org/get&quot;);
+</span><span style="color:#c0c5ce;">if type_of(data) == &quot;map&quot; {
+</span><span style="color:#c0c5ce;">    print(data.url);
+</span><span style="color:#c0c5ce;">    data.url
+</span><span style="color:#c0c5ce;">} else {
+</span><span style="color:#c0c5ce;">    print(data);
+</span><span style="color:#c0c5ce;">    data
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>http_get</code> is a Rust helper using <code>reqwest</code> to perform a blocking HTTP GET and
+deserialize the JSON response into a Rhai <code>map</code>. The script prints the <code>url</code>
+field when successful; otherwise it prints an error string.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">https://httpbin.org/get
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Uses the <code>http_get</code> helper registered in <code>src/examples/mod.rs</code>.</li>
+<li>Demonstrates type checking with <code>type_of</code>.</li>
+</ul>
+<p>Note: Network requests require the <code>reqwest</code> crate and internet access; see <a href="https://rhai.rs/book/engine/https.html">https://rhai.rs/book/engine/https.html</a>.</p>
+</body></html>

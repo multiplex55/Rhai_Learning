@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Custom Module</h1>
+<p>Loads a user-defined module and calls its function.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">import &quot;math_utils.rhai&quot; as math;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">let n = 4;
+</span><span style="color:#c0c5ce;">let sq = math::square(n);
+</span><span style="color:#c0c5ce;">print(&quot;square(&quot; + n.to_string() + &quot;) = &quot; + sq.to_string());
+</span><span style="color:#c0c5ce;">sq
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>import</code> brings in <code>math_utils.rhai</code> as <code>math</code>. The <code>square</code> function is
+called to compute <code>n * n</code>, the result is printed, and the value <code>sq</code> is
+returned.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">square(4) = 16
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Demonstrates module loading with <code>import</code>.</li>
+<li>No Rust helpers are used.</li>
+</ul>
+<p>Note: Module paths are relative to the script; see <a href="https://rhai.rs/book/modules/import.html">https://rhai.rs/book/modules/import.html</a>.</p>
+</body></html>

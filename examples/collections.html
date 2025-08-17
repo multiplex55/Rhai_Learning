@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Collections &amp; Iteration</h1>
+<p>Mutates an array and a map before computing a total.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let numbers = [1, 2, 3];
+</span><span style="color:#c0c5ce;">for i in 0..numbers.len() {
+</span><span style="color:#c0c5ce;">    numbers[i] *= 2;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">let total = 0;
+</span><span style="color:#c0c5ce;">for n in numbers {
+</span><span style="color:#c0c5ce;">    total += n;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">let scores = #{ &quot;Alice&quot;: 1, &quot;Bob&quot;: 2 };
+</span><span style="color:#c0c5ce;">for name in scores.keys() {
+</span><span style="color:#c0c5ce;">    scores[name] += 1;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">scores[&quot;Cara&quot;] = total;
+</span><span style="color:#c0c5ce;">numbers.push(scores[&quot;Bob&quot;]);
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">total
+</span></code></pre>
+<h2>How It Works</h2>
+<p>The script doubles each element of <code>numbers</code>, sums the results into <code>total</code>,
+and updates a <code>scores</code> map. The last expression yields the total sum.</p>
+<p>Expected console output: <em>(none)</em></p>
+<h2>Key Points</h2>
+<ul>
+<li>Shows array indexing, iteration and mutation.</li>
+<li>Demonstrates map operations and dynamic key access.</li>
+<li>Returns the final <code>total</code> (12).</li>
+</ul>
+<p>Note: Collections in Rhai are dynamically typed; see <a href="https://rhai.rs/book/language/arrays-maps.html">https://rhai.rs/book/language/arrays-maps.html</a>.</p>
+</body></html>

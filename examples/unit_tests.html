@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Unit Test Style</h1>
+<p>Mimics unit testing with debug logs and assertions.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">debug(&quot;starting tests&quot;);
+</span><span style="color:#c0c5ce;">let x = 1 + 1;
+</span><span style="color:#c0c5ce;">assert(x == 2);
+</span><span style="color:#c0c5ce;">debug(&quot;math ok&quot;);
+</span><span style="color:#c0c5ce;">print(`x=${x}`);
+</span><span style="color:#c0c5ce;">true
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>debug</code> writes diagnostic messages, while the Rust helper <code>assert</code> panics if
+its condition is false. The script prints the final value of <code>x</code> and returns
+<code>true</code> when all assertions pass.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">DEBUG: starting tests
+</span><span style="color:#c0c5ce;">DEBUG: math ok
+</span><span style="color:#c0c5ce;">x=2
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Combines <code>debug</code> and <code>assert</code> for lightweight test scripts.</li>
+<li><code>assert</code> is registered in <code>src/examples/mod.rs</code>.</li>
+</ul>
+<p>Note: The <code>debug</code> statements are captured by the host; see <a href="https://rhai.rs/book/appendix/debugging.html">https://rhai.rs/book/appendix/debugging.html</a>.</p>
+</body></html>
