@@ -50,3 +50,41 @@ fn async_sim_example_runs() {
     assert!(result.stdout.contains("task complete"));
     assert_eq!(result.value.clone_cast::<String>(), "done");
 }
+
+#[test]
+fn collections_example_runs() {
+    let registry = ExampleRegistry::all();
+    let ex = registry
+        .iter()
+        .find(|e| e.id == "collections")
+        .expect("collections example");
+    let result = ex.run();
+    assert_eq!(result.stdout, "");
+    assert_eq!(result.value.clone_cast::<i64>(), 12);
+}
+
+#[test]
+fn error_handling_example_catches() {
+    let registry = ExampleRegistry::all();
+    let ex = registry
+        .iter()
+        .find(|e| e.id == "error-handling")
+        .expect("error-handling example");
+    let result = ex.run();
+    let map = result.value.clone_cast::<rhai::Map>();
+    assert_eq!(map["msg"].clone_cast::<String>(), "division by zero");
+    assert_eq!(map["value"].clone_cast::<i64>(), -1);
+}
+
+#[test]
+fn random_example_rolls_die() {
+    let registry = ExampleRegistry::all();
+    let ex = registry
+        .iter()
+        .find(|e| e.id == "random")
+        .expect("random example");
+    let result = ex.run();
+    let roll: i64 = result.stdout.trim().parse().expect("number");
+    assert!(roll >= 1 && roll <= 6);
+    assert_eq!(roll, result.value.clone_cast::<i64>());
+}
