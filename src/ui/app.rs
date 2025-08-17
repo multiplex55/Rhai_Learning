@@ -3,7 +3,7 @@
 use crate::examples::{Example, ExampleRegistry};
 use eframe::egui;
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
-use std::sync::mpsc::{channel, Receiver};
+use std::sync::mpsc::{Receiver, channel};
 
 /// Top-level application state for the Rhai learning UI.
 pub struct App {
@@ -15,6 +15,8 @@ pub struct App {
     watcher: RecommendedWatcher,
     watch_rx: Receiver<Event>,
     reload_notice: Option<String>,
+    /// Current filter for example names.
+    filter: String,
 }
 
 impl Default for App {
@@ -38,6 +40,7 @@ impl Default for App {
             watcher,
             watch_rx: rx,
             reload_notice: None,
+            filter: String::new(),
         }
     }
 }
@@ -83,6 +86,8 @@ impl eframe::App for App {
 
         // Side panel listing all examples and reload button.
         egui::SidePanel::left("example_list").show(ctx, |ui| {
+            ui.text_edit_singleline(&mut self.filter);
+
             if ui.button("Reload scripts").clicked() {
                 let selected_id = self
                     .selected
@@ -100,13 +105,41 @@ impl eframe::App for App {
             if let Some(msg) = self.reload_notice.take() {
                 ui.label(egui::RichText::new(msg).color(egui::Color32::LIGHT_GREEN));
             }
-
+            let filter = self.filter.to_ascii_lowercase();
             for (i, ex) in self.examples.iter().enumerate() {
-                if ui
-                    .selectable_label(self.selected == Some(i), &ex.name)
-                    .clicked()
-                {
-                    self.selected = Some(i);
+                let name = ex.name.to_ascii_lowercase();
+                if filter.is_empty() || name.contains(&filter) {
+                    if filter.is_empty() {
+                        if ui
+                            .selectable_label(self.selected == Some(i), &ex.name)
+                            .clicked()
+                        {
+                            self.selected = Some(i);
+                        }
+                    } else if let Some(pos) = name.find(&filter) {
+                        let len = self.filter.len();
+                        let mut job = egui::text::LayoutJob::default();
+                        let font = egui::TextStyle::Button.resolve(ui.style());
+                        let color = ui.visuals().text_color();
+                        job.append(
+                            &ex.name[..pos],
+                            0.0,
+                            egui::text::TextFormat::simple(font.clone(), color),
+                        );
+                        job.append(
+                            &ex.name[pos..pos + len],
+                            0.0,
+                            egui::text::TextFormat::simple(font.clone(), egui::Color32::YELLOW),
+                        );
+                        job.append(
+                            &ex.name[pos + len..],
+                            0.0,
+                            egui::text::TextFormat::simple(font, color),
+                        );
+                        if ui.selectable_label(self.selected == Some(i), job).clicked() {
+                            self.selected = Some(i);
+                        }
+                    }
                 }
             }
         });
@@ -139,10 +172,7 @@ impl eframe::App for App {
                     ui.label(format!("Note: {}", note));
                 }
                 // Link to rendered HTML documentation instead of raw Markdown
-                ui.hyperlink_to(
-                    "Documentation",
-                    ex.doc_html_path.to_string_lossy(),
-                );
+                ui.hyperlink_to("Documentation", ex.doc_html_path.to_string_lossy());
                 if ui.button("Run").clicked() {
                     self.run_selected();
                 }
