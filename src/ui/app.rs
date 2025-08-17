@@ -138,7 +138,11 @@ impl eframe::App for App {
                 if let Some(note) = &ex.note {
                     ui.label(format!("Note: {}", note));
                 }
-                ui.hyperlink_to("Documentation", ex.doc_html_path.to_string_lossy());
+                // Link to rendered HTML documentation instead of raw Markdown
+                ui.hyperlink_to(
+                    "Documentation",
+                    ex.doc_html_path.to_string_lossy(),
+                );
                 if ui.button("Run").clicked() {
                     self.run_selected();
                 }
