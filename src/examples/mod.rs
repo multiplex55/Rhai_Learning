@@ -1,6 +1,7 @@
-use std::path::{Path, PathBuf};
-use serde::Deserialize;
 use rhai::{Dynamic, Engine};
+use serde::Deserialize;
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 
 /// Metadata and execution support for a single Rhai example.
 #[derive(Clone, Debug)]
@@ -13,17 +14,36 @@ pub struct Example {
     pub script_path: PathBuf,
 }
 
+/// Result of running a Rhai example.
+pub struct RunResult {
+    pub stdout: String,
+    pub value: Dynamic,
+}
+
 impl Example {
-    /// Run this example's script, returning the evaluation result or an error message.
-    pub fn run(&self) -> Dynamic {
-        let engine = Engine::new();
+    /// Run this example's script, capturing any printed output and returning the result.
+    pub fn run(&self) -> RunResult {
+        let stdout = Arc::new(Mutex::new(String::new()));
+        let mut engine = Engine::new();
+        // Capture calls to `print` into our stdout buffer.
+        let out = stdout.clone();
+        engine.on_print(move |s| {
+            if let Ok(mut buf) = out.lock() {
+                buf.push_str(s);
+                buf.push('\n');
+            }
+        });
+
         // Custom Rust types/functions could be registered on `engine` here.
-        match std::fs::read_to_string(&self.script_path) {
+        let value = match std::fs::read_to_string(&self.script_path) {
             Ok(code) => engine
                 .eval::<Dynamic>(&code)
                 .unwrap_or_else(|e| format!("Error: {e}").into()),
             Err(e) => format!("Error loading script: {e}").into(),
-        }
+        };
+
+        let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
+        RunResult { stdout, value }
     }
 }
 
@@ -49,10 +69,9 @@ impl ExampleRegistry {
     /// Load the example registry from `examples/manifest.toml`.
     pub fn load() -> Self {
         let manifest_path = Path::new("examples/manifest.toml");
-        let data = std::fs::read_to_string(manifest_path)
-            .expect("failed to read examples manifest");
-        let manifest: Manifest = toml::from_str(&data)
-            .expect("failed to parse examples manifest");
+        let data =
+            std::fs::read_to_string(manifest_path).expect("failed to read examples manifest");
+        let manifest: Manifest = toml::from_str(&data).expect("failed to parse examples manifest");
 
         let examples = manifest
             .examples
@@ -98,10 +117,11 @@ fn parse_doc(path: &Path) -> (String, Option<String>) {
     (description, note)
 }
 
-/// Return all examples sorted by id.
-pub fn all() -> Vec<Example> {
-    let mut registry = ExampleRegistry::load();
-    registry.examples.sort_by(|a, b| a.id.cmp(&b.id));
-    registry.examples
+impl ExampleRegistry {
+    /// Return all examples sorted by id.
+    pub fn all() -> Vec<Example> {
+        let mut registry = Self::load();
+        registry.examples.sort_by(|a, b| a.id.cmp(&b.id));
+        registry.examples
+    }
 }
-
