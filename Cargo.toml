@@ -14,3 +14,7 @@ reqwest = { version = "0.11", features = ["blocking", "json"] }
 
 [dev-dependencies]
 criterion = "0.7.0"
+
+[[bench]]
+name = "compare"
+harness = false
