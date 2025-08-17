@@ -39,3 +39,17 @@ source so you can explore and modify the code.
 
 Additional guides can be found in the [`docs/`](docs) directory or viewed as a
 compiled book using [mdBook](https://rust-lang.github.io/mdBook/).
+
+## Benchmarks
+
+The project includes Criterion benchmarks that compare equivalent logic
+implemented in pure Rust and in a Rhai script executed through the `Engine`.
+
+Run the benchmarks with:
+
+```bash
+cargo bench
+```
+
+Benchmark reports are written to `target/criterion/`, where you can review
+timing results and graphs for each benchmark.
