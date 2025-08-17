@@ -1,0 +1,5 @@
+[[examples]]
+id = "hello"
+name = "Hello World"
+script = "examples/hello.rhai"
+doc = "examples/hello.md"
