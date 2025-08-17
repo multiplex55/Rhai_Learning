@@ -21,6 +21,10 @@ pub struct App {
     script: String,
     /// ID of the example whose script is loaded in `script`.
     loaded_script: Option<String>,
+    /// Debug-format of the last compiled AST.
+    ast_text: String,
+    /// Whether the AST window is open.
+    show_ast: bool,
 }
 
 impl Default for App {
@@ -47,6 +51,8 @@ impl Default for App {
             filter: String::new(),
             script: String::new(),
             loaded_script: None,
+            ast_text: String::new(),
+            show_ast: false,
         }
     }
 }
@@ -70,6 +76,8 @@ impl App {
                     self.console.push_str(&result.stdout);
                 }
                 self.console.push_str(&format!("=> {}", result.value));
+
+                self.ast_text = format!("{:?}", result.ast);
 
                 let log_path = format!("logs/{}.log", example.id);
                 self.logs = std::fs::read_to_string(log_path).unwrap_or_default();
@@ -216,10 +224,32 @@ impl eframe::App for App {
                     if ui.button("Save").clicked() {
                         let _ = std::fs::write(&script_path, &self.script);
                     }
+                    if ui.button("Show AST").clicked() {
+                        self.show_ast = true;
+                    }
                 });
             } else {
                 ui.label("Select an example from the left");
             }
         });
+
+        if self.show_ast {
+            egui::Window::new("AST")
+                .open(&mut self.show_ast)
+                .show(ctx, |ui| {
+                    egui::ScrollArea::vertical().show(ui, |ui| {
+                        ui.monospace(&self.ast_text);
+                    });
+                    if ui.button("Export AST").clicked() {
+                        if let Some(idx) = self.selected {
+                            let id = &self.examples[idx].id;
+                            let log_dir = std::path::Path::new("logs");
+                            let _ = std::fs::create_dir_all(log_dir);
+                            let path = log_dir.join(format!("{}.ast", id));
+                            let _ = std::fs::write(path, &self.ast_text);
+                        }
+                    }
+                });
+        }
     }
 }
