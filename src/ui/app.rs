@@ -2,6 +2,8 @@
 
 use crate::examples::{Example, ExampleRegistry};
 use eframe::egui;
+use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
+use std::sync::mpsc::{channel, Receiver};
 
 /// Top-level application state for the Rhai learning UI.
 pub struct App {
@@ -9,16 +11,33 @@ pub struct App {
     selected: Option<usize>,
     console: String,
     logs: String,
+    #[allow(dead_code)]
+    watcher: RecommendedWatcher,
+    watch_rx: Receiver<Event>,
+    reload_notice: Option<String>,
 }
 
 impl Default for App {
     fn default() -> Self {
         let examples = ExampleRegistry::all();
+        let (tx, rx) = channel();
+        let mut watcher = notify::recommended_watcher(move |res| {
+            if let Ok(event) = res {
+                let _ = tx.send(event);
+            }
+        })
+        .expect("failed to create watcher");
+        watcher
+            .watch(std::path::Path::new("examples"), RecursiveMode::Recursive)
+            .expect("failed to watch examples");
         Self {
             examples,
             selected: None,
             console: String::new(),
             logs: String::new(),
+            watcher,
+            watch_rx: rx,
+            reload_notice: None,
         }
     }
 }
@@ -43,6 +62,25 @@ impl App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        while let Ok(event) = self.watch_rx.try_recv() {
+            if event
+                .paths
+                .iter()
+                .any(|p| p.extension().and_then(|s| s.to_str()) == Some("rhai"))
+            {
+                let selected_id = self
+                    .selected
+                    .and_then(|i| self.examples.get(i).map(|e| e.id.clone()));
+                self.examples = ExampleRegistry::all();
+                self.selected =
+                    selected_id.and_then(|id| self.examples.iter().position(|e| e.id == id));
+                if self.selected.is_some() {
+                    self.run_selected();
+                }
+                self.reload_notice = Some("Scripts recompiled".to_string());
+            }
+        }
+
         // Side panel listing all examples and reload button.
         egui::SidePanel::left("example_list").show(ctx, |ui| {
             if ui.button("Reload scripts").clicked() {
@@ -58,6 +96,10 @@ impl eframe::App for App {
             }
 
             ui.separator();
+
+            if let Some(msg) = self.reload_notice.take() {
+                ui.label(egui::RichText::new(msg).color(egui::Color32::LIGHT_GREEN));
+            }
 
             for (i, ex) in self.examples.iter().enumerate() {
                 if ui
