@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Error Handling</h1>
+<p>Shows using <code>throw</code> with <code>try</code>/<code>catch</code>.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">fn divide(x, y) {
+</span><span style="color:#c0c5ce;">    if y == 0 {
+</span><span style="color:#c0c5ce;">        throw &quot;division by zero&quot;;
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">    x / y
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">let message = &quot;&quot;;
+</span><span style="color:#c0c5ce;">let value = 0;
+</span><span style="color:#c0c5ce;">try {
+</span><span style="color:#c0c5ce;">    value = divide(10, 0);
+</span><span style="color:#c0c5ce;">} catch (err) {
+</span><span style="color:#c0c5ce;">    message = err;
+</span><span style="color:#c0c5ce;">    value = -1;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">print(&quot;Caught: &quot; + message);
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">#{ msg: message, value: value }
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>divide</code> throws an error when dividing by zero. The <code>try</code> block catches the
+error, records the message, and sets a fallback value. The script prints the
+captured message and returns it together with the value in a map.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">Caught: division by zero
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Illustrates <code>throw</code>, <code>try</code>, and <code>catch</code>.</li>
+<li>Returns a map with the error message and computed value.</li>
+</ul>
+<p>Note: Error strings can be any <code>Dynamic</code>; see <a href="https://rhai.rs/book/control-flow/error.html">https://rhai.rs/book/control-flow/error.html</a>.</p>
+</body></html>

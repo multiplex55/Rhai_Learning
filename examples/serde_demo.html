@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Serde Demo</h1>
+<p>Serializes and deserializes values with JSON.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let data = #{ name: &quot;Alice&quot;, age: 30 };
+</span><span style="color:#c0c5ce;">let json = to_json(data);
+</span><span style="color:#c0c5ce;">print(json);
+</span><span style="color:#c0c5ce;">let parsed = from_json(json);
+</span><span style="color:#c0c5ce;">print(`${parsed.name} is ${parsed.age} years old`);
+</span><span style="color:#c0c5ce;">parsed
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>to_json</code> and <code>from_json</code> are Rust helpers backed by <code>serde_json</code>. The map is
+serialized to a JSON string, printed, parsed back, and printed again. The
+deserialized map is returned.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">{&quot;name&quot;:&quot;Alice&quot;,&quot;age&quot;:30}
+</span><span style="color:#c0c5ce;">Alice is 30 years old
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Shows round-tripping data between Rhai and JSON.</li>
+<li>Uses the <code>serde</code> feature via <code>to_json</code>/<code>from_json</code>.</li>
+</ul>
+<p>Note: Requires enabling <code>serde</code> support in the host application; see <a href="https://rhai.rs/book/features/serde.html">https://rhai.rs/book/features/serde.html</a>.</p>
+</body></html>

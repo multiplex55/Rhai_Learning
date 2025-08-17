@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Async Simulation</h1>
+<p>Simulates a short delay by pausing execution.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">print(&quot;starting task...&quot;);
+</span><span style="color:#c0c5ce;">sleep_ms(50);
+</span><span style="color:#c0c5ce;">print(&quot;task complete&quot;);
+</span><span style="color:#c0c5ce;">&quot;done&quot;
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>sleep_ms</code> is a Rust helper that blocks the current thread for the given
+milliseconds. The script prints messages before and after the pause and
+returns &quot;done&quot;.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">starting task...
+</span><span style="color:#c0c5ce;">task complete
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Uses the Rust function <code>sleep_ms</code> registered in <code>src/examples/mod.rs</code>.</li>
+<li>Demonstrates sequencing of work around delays.</li>
+</ul>
+<p>Note: This helper merely sleeps the thread; it is not asynchronous. See <a href="https://rhai.rs/book/operations/sleep.html">https://rhai.rs/book/operations/sleep.html</a>.</p>
+</body></html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Using a Rust Struct</h1>
+<p>Calls methods on a <code>Point</code> type defined in Rust.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let p = Point(3, 4);
+</span><span style="color:#c0c5ce;">print(`length: ${p.length()}`);
+</span><span style="color:#c0c5ce;">p.length()
+</span></code></pre>
+<h2>How It Works</h2>
+<p>The <code>Point</code> struct and its <code>length</code> method are registered from Rust. The script
+constructs a point, prints its length, and returns the numeric result.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">length: 5
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Demonstrates binding a Rust type into Rhai.</li>
+<li>Uses <code>Point</code> and <code>length</code> registered in <code>src/examples/mod.rs</code>.</li>
+</ul>
+<p>Note: Struct methods mutate <code>self</code> by default unless declared otherwise.</p>
+</body></html>

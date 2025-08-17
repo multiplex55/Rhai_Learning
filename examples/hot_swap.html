@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Hot Swap</h1>
+<p>Reads a message from an external file.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let msg = read_file(&quot;examples/hot_message.txt&quot;);
+</span><span style="color:#c0c5ce;">print(msg);
+</span><span style="color:#c0c5ce;">msg
+</span></code></pre>
+<h2>How It Works</h2>
+<p><code>read_file</code> is a Rust helper that loads the text from <code>hot_message.txt</code>. The
+value is printed and then returned. Editing the file and rerunning the script
+changes the output.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">Initial message
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Demonstrates using the <code>read_file</code> helper to read disk files.</li>
+<li>Mimics hot-swapping by reloading external content.</li>
+</ul>
+<p>Note: <code>read_file</code> reads relative to the process working directory.</p>
+</body></html>

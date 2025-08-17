@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<h1>Basic Arithmetic and Control Flow</h1>
+<p>Adds numbers from 1 to 10 and reports the sum.</p>
+<h2>Code</h2>
+<pre style="background-color:#2b303b;"><code class="language-rhai"><span style="color:#c0c5ce;">let sum = 0;
+</span><span style="color:#c0c5ce;">for n in 1..=10 {
+</span><span style="color:#c0c5ce;">    sum += n;
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">if sum &gt; 50 {
+</span><span style="color:#c0c5ce;">    print(`sum is ${sum}`);
+</span><span style="color:#c0c5ce;">} else {
+</span><span style="color:#c0c5ce;">    print(&quot;sum too small&quot;);
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">sum
+</span></code></pre>
+<h2>How It Works</h2>
+<p>The loop accumulates the numbers 1 through 10. A conditional prints whether
+the total exceeds 50. The final expression evaluates to the sum.</p>
+<p>Expected console output:</p>
+<pre style="background-color:#2b303b;"><code><span style="color:#c0c5ce;">sum is 55
+</span></code></pre>
+<h2>Key Points</h2>
+<ul>
+<li>Demonstrates <code>for</code> loops and <code>if</code> statements.</li>
+<li>Returns the computed <code>sum</code>.</li>
+</ul>
+<p>Note: See <a href="https://rhai.rs/book/control-flow.html">https://rhai.rs/book/control-flow.html</a> for more on Rhai control structures.</p>
+</body></html>
