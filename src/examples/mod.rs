@@ -70,7 +70,10 @@ pub struct Example {
     /// Optional additional note.
     pub note: Option<String>,
     /// Path to the Markdown documentation.
+    #[allow(dead_code)]
     pub doc_path: PathBuf,
+    /// Path to the rendered HTML documentation.
+    pub doc_html_path: PathBuf,
     /// Path to the Rhai script file.
     pub script_path: PathBuf,
 }
@@ -172,7 +175,8 @@ impl ExampleRegistry {
             .examples
             .into_iter()
             .map(|m| {
-                let doc_path = PathBuf::from(&m.doc);
+                let doc_html_path = PathBuf::from(&m.doc);
+                let doc_path = doc_html_path.with_extension("md");
                 let script_path = PathBuf::from(&m.script);
                 let (description, note) = parse_doc(&doc_path);
                 Example {
@@ -181,6 +185,7 @@ impl ExampleRegistry {
                     description,
                     note,
                     doc_path,
+                    doc_html_path,
                     script_path,
                 }
             })
