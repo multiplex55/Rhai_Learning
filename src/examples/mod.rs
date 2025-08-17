@@ -1,7 +1,7 @@
 //! Utilities for loading, running, and documenting Rhai example scripts.
 
 use rand::Rng;
-use rhai::{Dynamic, Engine, AST, module_resolvers::FileModuleResolver};
+use rhai::{AST, Dynamic, Engine, EvalAltResult, module_resolvers::FileModuleResolver};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -86,11 +86,13 @@ pub struct RunResult {
     pub value: Dynamic,
     /// Compiled AST of the script.
     pub ast: AST,
+    /// Error string when evaluation fails.
+    pub error: Option<String>,
 }
 
 impl Example {
     /// Run this example's script, capturing any printed output and returning the result.
-    pub fn run(&self) -> RunResult {
+    pub fn run(&self) -> Result<Dynamic, Box<EvalAltResult>> {
         let stdout = Arc::new(Mutex::new(String::new()));
         let mut engine = Engine::new();
         let mut resolver = FileModuleResolver::new();
@@ -129,16 +131,8 @@ impl Example {
         engine.register_fn("sleep_ms", sleep_ms);
         engine.register_fn("rand_int", rand_int);
 
-        // Compile the script file so relative imports work and keep the AST.
-        let (ast, value) = match engine.compile_file(self.script_path.clone()) {
-            Ok(ast) => {
-                let value = engine
-                    .eval_ast::<Dynamic>(&ast)
-                    .unwrap_or_else(|e| format!("Error: {e}").into());
-                (ast, value)
-            }
-            Err(e) => (AST::empty(), format!("Error: {e}").into()),
-        };
+        // Evaluate the script file so relative imports work.
+        let result = engine.eval_file::<Dynamic>(self.script_path.clone());
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
 
@@ -149,7 +143,7 @@ impl Example {
             let _ = std::fs::write(log_path, &stdout);
         }
 
-        RunResult { stdout, value, ast }
+        result
     }
 
     /// Run a provided script text for this example instead of reading from file.
@@ -195,14 +189,12 @@ impl Example {
         engine.register_fn("rand_int", rand_int);
 
         // Compile the provided script text and keep the AST.
-        let (ast, value) = match engine.compile(script) {
-            Ok(ast) => {
-                let value = engine
-                    .eval_ast::<Dynamic>(&ast)
-                    .unwrap_or_else(|e| format!("Error: {e}").into());
-                (ast, value)
-            }
-            Err(e) => (AST::empty(), format!("Error: {e}").into()),
+        let (ast, value, error) = match engine.compile(script) {
+            Ok(ast) => match engine.eval_ast::<Dynamic>(&ast) {
+                Ok(v) => (ast, v, None),
+                Err(e) => (ast, Dynamic::UNIT, Some(format!("{:?}", e))),
+            },
+            Err(e) => (AST::empty(), Dynamic::UNIT, Some(format!("{:?}", e))),
         };
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
@@ -214,7 +206,12 @@ impl Example {
             let _ = std::fs::write(log_path, &stdout);
         }
 
-        RunResult { stdout, value, ast }
+        RunResult {
+            stdout,
+            value,
+            ast,
+            error,
+        }
     }
 }
 
@@ -323,8 +320,10 @@ mod tests {
                 .iter()
                 .find(|e| e.id == id)
                 .expect("example not found");
-            let result = ex.run();
-            println!("{} => {} | {:?}", id, result.stdout.trim(), result.value);
+            match ex.run() {
+                Ok(val) => println!("{} => {:?}", id, val),
+                Err(e) => println!("{} => error: {:?}", id, e),
+            }
         }
     }
 }

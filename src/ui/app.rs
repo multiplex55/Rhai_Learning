@@ -75,7 +75,11 @@ impl App {
                 if !result.stdout.is_empty() {
                     self.console.push_str(&result.stdout);
                 }
-                self.console.push_str(&format!("=> {}", result.value));
+                if let Some(err) = &result.error {
+                    self.console.push_str(err);
+                } else {
+                    self.console.push_str(&format!("=> {}", result.value));
+                }
 
                 self.ast_text = format!("{:?}", result.ast);
 
