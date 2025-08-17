@@ -1,6 +1,8 @@
 # Collections & Iteration
 
-Demonstrates creating arrays and maps, iterating over them, and mutating values.
+Mutates an array and a map before computing a total.
+
+## Code
 
 ```rhai
 let numbers = [1, 2, 3];
@@ -15,6 +17,23 @@ let scores = #{ "Alice": 1, "Bob": 2 };
 for name in scores.keys() {
     scores[name] += 1;
 }
+scores["Cara"] = total;
+numbers.push(scores["Bob"]);
+
+total
 ```
 
-The final value `total` is returned, showing the result of these mutations.
+## How It Works
+
+The script doubles each element of `numbers`, sums the results into `total`,
+and updates a `scores` map. The last expression yields the total sum.
+
+Expected console output: *(none)*
+
+## Key Points
+
+- Shows array indexing, iteration and mutation.
+- Demonstrates map operations and dynamic key access.
+- Returns the final `total` (12).
+
+Note: Collections in Rhai are dynamically typed; see <https://rhai.rs/book/language/arrays-maps.html>.

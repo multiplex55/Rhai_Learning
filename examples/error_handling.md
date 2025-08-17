@@ -1,6 +1,8 @@
 # Error Handling
 
-Shows how to use `try`/`catch` and `throw` for custom error messages.
+Shows using `throw` with `try`/`catch`.
+
+## Code
 
 ```rhai
 fn divide(x, y) {
@@ -19,5 +21,25 @@ try {
     value = -1;
 }
 print("Caught: " + message);
+
+#{ msg: message, value: value }
 ```
-Running this prints `Caught: division by zero` and returns a map `{ msg: "division by zero", value: -1 }`.
+
+## How It Works
+
+`divide` throws an error when dividing by zero. The `try` block catches the
+error, records the message, and sets a fallback value. The script prints the
+captured message and returns it together with the value in a map.
+
+Expected console output:
+
+```
+Caught: division by zero
+```
+
+## Key Points
+
+- Illustrates `throw`, `try`, and `catch`.
+- Returns a map with the error message and computed value.
+
+Note: Error strings can be any `Dynamic`; see <https://rhai.rs/book/control-flow/error.html>.
