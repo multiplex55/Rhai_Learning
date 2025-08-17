@@ -1,3 +1,5 @@
+//! Entry point for the Rhai Learning application.
+
 mod examples;
 mod ui;
 
