@@ -1,3 +1,5 @@
+//! eframe/`egui` application displaying and executing Rhai examples.
+
 use crate::examples::{Example, ExampleRegistry};
 use eframe::egui;
 

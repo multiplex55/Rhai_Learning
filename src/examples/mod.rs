@@ -1,4 +1,6 @@
-use rhai::{module_resolvers::FileModuleResolver, Dynamic, Engine};
+//! Utilities for loading, running, and documenting Rhai example scripts.
+
+use rhai::{Dynamic, Engine, module_resolvers::FileModuleResolver};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -50,17 +52,25 @@ fn read_file(path: &str) -> String {
 /// Metadata and execution support for a single Rhai example.
 #[derive(Clone, Debug)]
 pub struct Example {
+    /// Unique identifier for the example.
     pub id: String,
+    /// Human‑readable display name.
     pub name: String,
+    /// Short description shown in the UI.
     pub description: String,
+    /// Optional additional note.
     pub note: Option<String>,
+    /// Path to the Markdown documentation.
     pub doc_path: PathBuf,
+    /// Path to the Rhai script file.
     pub script_path: PathBuf,
 }
 
 /// Result of running a Rhai example.
 pub struct RunResult {
+    /// Captured standard output from the script.
     pub stdout: String,
+    /// Final value returned by the script.
     pub value: Dynamic,
 }
 
