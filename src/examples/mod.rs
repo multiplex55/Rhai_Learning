@@ -1,7 +1,7 @@
 //! Utilities for loading, running, and documenting Rhai example scripts.
 
 use rand::Rng;
-use rhai::{Dynamic, Engine, module_resolvers::FileModuleResolver};
+use rhai::{Dynamic, Engine, AST, module_resolvers::FileModuleResolver};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -84,6 +84,8 @@ pub struct RunResult {
     pub stdout: String,
     /// Final value returned by the script.
     pub value: Dynamic,
+    /// Compiled AST of the script.
+    pub ast: AST,
 }
 
 impl Example {
@@ -127,10 +129,16 @@ impl Example {
         engine.register_fn("sleep_ms", sleep_ms);
         engine.register_fn("rand_int", rand_int);
 
-        // Evaluate the script file so relative imports work.
-        let value = engine
-            .eval_file::<Dynamic>(self.script_path.clone())
-            .unwrap_or_else(|e| format!("Error: {e}").into());
+        // Compile the script file so relative imports work and keep the AST.
+        let (ast, value) = match engine.compile_file(self.script_path.clone()) {
+            Ok(ast) => {
+                let value = engine
+                    .eval_ast::<Dynamic>(&ast)
+                    .unwrap_or_else(|e| format!("Error: {e}").into());
+                (ast, value)
+            }
+            Err(e) => (AST::empty(), format!("Error: {e}").into()),
+        };
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
 
@@ -141,7 +149,7 @@ impl Example {
             let _ = std::fs::write(log_path, &stdout);
         }
 
-        RunResult { stdout, value }
+        RunResult { stdout, value, ast }
     }
 
     /// Run a provided script text for this example instead of reading from file.
@@ -186,10 +194,16 @@ impl Example {
         engine.register_fn("sleep_ms", sleep_ms);
         engine.register_fn("rand_int", rand_int);
 
-        // Evaluate the provided script text.
-        let value = engine
-            .eval::<Dynamic>(script)
-            .unwrap_or_else(|e| format!("Error: {e}").into());
+        // Compile the provided script text and keep the AST.
+        let (ast, value) = match engine.compile(script) {
+            Ok(ast) => {
+                let value = engine
+                    .eval_ast::<Dynamic>(&ast)
+                    .unwrap_or_else(|e| format!("Error: {e}").into());
+                (ast, value)
+            }
+            Err(e) => (AST::empty(), format!("Error: {e}").into()),
+        };
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
 
@@ -200,7 +214,7 @@ impl Example {
             let _ = std::fs::write(log_path, &stdout);
         }
 
-        RunResult { stdout, value }
+        RunResult { stdout, value, ast }
     }
 }
 
