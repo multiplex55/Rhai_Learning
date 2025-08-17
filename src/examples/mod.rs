@@ -1,7 +1,51 @@
-use rhai::{Dynamic, Engine};
+use rhai::{module_resolvers::FileModuleResolver, Dynamic, Engine};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
+
+#[derive(Clone)]
+struct Point {
+    x: i64,
+    y: i64,
+}
+
+impl Point {
+    fn new(x: i64, y: i64) -> Self {
+        Self { x, y }
+    }
+
+    fn length(&mut self) -> f64 {
+        ((self.x * self.x + self.y * self.y) as f64).sqrt()
+    }
+}
+
+fn http_get(url: &str) -> Dynamic {
+    match reqwest::blocking::get(url) {
+        Ok(resp) => match resp.json::<Dynamic>() {
+            Ok(json) => json,
+            Err(e) => format!("Error parsing JSON: {e}").into(),
+        },
+        Err(e) => format!("Request error: {e}").into(),
+    }
+}
+
+fn to_json(value: Dynamic) -> String {
+    serde_json::to_string(&value).unwrap_or_default()
+}
+
+fn from_json(s: &str) -> Dynamic {
+    serde_json::from_str::<Dynamic>(s).unwrap_or(Dynamic::UNIT)
+}
+
+fn assert_fn(cond: bool) {
+    if !cond {
+        panic!("assertion failed");
+    }
+}
+
+fn read_file(path: &str) -> String {
+    std::fs::read_to_string(path).unwrap_or_else(|e| format!("Error reading file: {e}"))
+}
 
 /// Metadata and execution support for a single Rhai example.
 #[derive(Clone, Debug)]
@@ -25,6 +69,11 @@ impl Example {
     pub fn run(&self) -> RunResult {
         let stdout = Arc::new(Mutex::new(String::new()));
         let mut engine = Engine::new();
+        let mut resolver = FileModuleResolver::new();
+        if let Some(parent) = self.script_path.parent() {
+            resolver.set_base_path(parent);
+        }
+        engine.set_module_resolver(resolver);
         // Capture calls to `print` into our stdout buffer.
         let out = stdout.clone();
         engine.on_print(move |s| {
@@ -34,13 +83,30 @@ impl Example {
             }
         });
 
-        // Custom Rust types/functions could be registered on `engine` here.
-        let value = match std::fs::read_to_string(&self.script_path) {
-            Ok(code) => engine
-                .eval::<Dynamic>(&code)
-                .unwrap_or_else(|e| format!("Error: {e}").into()),
-            Err(e) => format!("Error loading script: {e}").into(),
-        };
+        // Capture debug output as well.
+        let out_dbg = stdout.clone();
+        engine.on_debug(move |s, _, _| {
+            if let Ok(mut buf) = out_dbg.lock() {
+                buf.push_str("DEBUG: ");
+                buf.push_str(s);
+                buf.push('\n');
+            }
+        });
+
+        // Register custom Rust types and helper functions.
+        engine.register_type::<Point>();
+        engine.register_fn("Point", Point::new);
+        engine.register_fn("length", Point::length);
+        engine.register_fn("http_get", http_get);
+        engine.register_fn("to_json", to_json);
+        engine.register_fn("from_json", from_json);
+        engine.register_fn("assert", assert_fn);
+        engine.register_fn("read_file", read_file);
+
+        // Evaluate the script file so relative imports work.
+        let value = engine
+            .eval_file::<Dynamic>(self.script_path.clone())
+            .unwrap_or_else(|e| format!("Error: {e}").into());
 
         let stdout = stdout.lock().map(|s| s.clone()).unwrap_or_default();
         RunResult { stdout, value }
@@ -123,5 +189,33 @@ impl ExampleRegistry {
         let mut registry = Self::load();
         registry.examples.sort_by(|a, b| a.id.cmp(&b.id));
         registry.examples
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn run_new_examples() {
+        let ids = [
+            "basic-arith",
+            "use-struct",
+            "http-request",
+            "serde-demo",
+            "perf-loop",
+            "unit-tests",
+            "hot-swap",
+        ];
+
+        let registry = ExampleRegistry::all();
+        for id in ids {
+            let ex = registry
+                .iter()
+                .find(|e| e.id == id)
+                .expect("example not found");
+            let result = ex.run();
+            println!("{} => {} | {:?}", id, result.stdout.trim(), result.value);
+        }
     }
 }
