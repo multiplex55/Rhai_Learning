@@ -3,3 +3,45 @@ id = "hello"
 name = "Hello World"
 script = "examples/hello.rhai"
 doc = "examples/hello.md"
+
+[[examples]]
+id = "basic-arith"
+name = "Basic Arithmetic"
+script = "examples/basic_arith.rhai"
+doc = "examples/basic_arith.md"
+
+[[examples]]
+id = "use-struct"
+name = "Using a Rust Struct"
+script = "examples/use_struct.rhai"
+doc = "examples/use_struct.md"
+
+[[examples]]
+id = "http-request"
+name = "HTTP Request"
+script = "examples/http_request.rhai"
+doc = "examples/http_request.md"
+
+[[examples]]
+id = "serde-demo"
+name = "Serde Demo"
+script = "examples/serde_demo.rhai"
+doc = "examples/serde_demo.md"
+
+[[examples]]
+id = "perf-loop"
+name = "Performance Loop"
+script = "examples/perf_loop.rhai"
+doc = "examples/perf_loop.md"
+
+[[examples]]
+id = "unit-tests"
+name = "Unit Test Style"
+script = "examples/unit_tests.rhai"
+doc = "examples/unit_tests.md"
+
+[[examples]]
+id = "hot-swap"
+name = "Hot Swap"
+script = "examples/hot_swap.rhai"
+doc = "examples/hot_swap.md"
